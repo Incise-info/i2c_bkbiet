@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "i2c_master_frw", "i2c_master_frw\i2c_master_frw\i2c_master_frw.cproj", "{8432C8B5-E329-4F81-8FC7-31D769514DC9}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "i2c_slave_frw", "i2c_slave_frw\i2c_slave_frw.cproj", "{1069412B-0D65-437B-A4C3-14A18BCA7EC2}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "i2c_lib", "i2c_lib\i2c_lib.cproj", "{4CA6F5A1-C97C-4D60-B9AC-192783FE74F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8432C8B5-E329-4F81-8FC7-31D769514DC9}.Debug|AVR.ActiveCfg = Debug|AVR
+		{8432C8B5-E329-4F81-8FC7-31D769514DC9}.Debug|AVR.Build.0 = Debug|AVR
+		{8432C8B5-E329-4F81-8FC7-31D769514DC9}.Release|AVR.ActiveCfg = Release|AVR
+		{8432C8B5-E329-4F81-8FC7-31D769514DC9}.Release|AVR.Build.0 = Release|AVR
+		{1069412B-0D65-437B-A4C3-14A18BCA7EC2}.Debug|AVR.ActiveCfg = Debug|AVR
+		{1069412B-0D65-437B-A4C3-14A18BCA7EC2}.Debug|AVR.Build.0 = Debug|AVR
+		{1069412B-0D65-437B-A4C3-14A18BCA7EC2}.Release|AVR.ActiveCfg = Release|AVR
+		{1069412B-0D65-437B-A4C3-14A18BCA7EC2}.Release|AVR.Build.0 = Release|AVR
+		{4CA6F5A1-C97C-4D60-B9AC-192783FE74F0}.Debug|AVR.ActiveCfg = Debug|AVR
+		{4CA6F5A1-C97C-4D60-B9AC-192783FE74F0}.Debug|AVR.Build.0 = Debug|AVR
+		{4CA6F5A1-C97C-4D60-B9AC-192783FE74F0}.Release|AVR.ActiveCfg = Release|AVR
+		{4CA6F5A1-C97C-4D60-B9AC-192783FE74F0}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
