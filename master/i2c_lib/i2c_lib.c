@@ -12,8 +12,13 @@
 /************************************************************************/
 void i2c_Init(void)
 {
+	SDA=SCL=1;  //setting the input pins of clock and data
 	
+	TWICON0=0x08; //I2C enabled and start condition is given
 	
+	TWIADD=0x80; //address is given during inititation
+	
+	TWISTAT=0x00; //status register is initiated as 0
 }
 
 /************************************************************************/
@@ -21,7 +26,7 @@ void i2c_Init(void)
 /************************************************************************/
 void i2c_Wait(void);
 {
-	
+	while ((TWICON0 & 0x00) || (TWISTAT & 0x04)); //Transmit is in progress
 
 }
 
@@ -30,28 +35,35 @@ void i2c_Wait(void);
 /************************************************************************/
 void i2c_Start(void)
 {
-	
+	i2c_Wait();
+	TWISTA=1;
 }
 
 /************************************************************************/
 /*     i2c_Restart - Re-Start I2C communication                                                                 */
 /************************************************************************/
-void i2c_Restart(void){
+void i2c_Restart(void)
+{
+	i2c_Wait();
 	
 }
 
 /************************************************************************/
 /*     i2c_Stop - Stop I2C communication                                                                 */
 /************************************************************************/
-void i2c_Stop(void){
-	
+void i2c_Stop(void)
+{
+	i2c_Wait();
+	TWISTO=1;
 }
 
 /************************************************************************/
 /*      i2c_Write - Sends one byte of data                                                                */
 /************************************************************************/
-void i2c_Write(unsigned char data){
-	
+void i2c_Write(unsigned char data)
+{
+	i2c_Wait();
+	TWIDR=data;
 }
 
 /************************************************************************/
