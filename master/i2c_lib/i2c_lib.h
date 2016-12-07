@@ -5,9 +5,13 @@
  *  Author: Admin
  */ 
 
-
 #ifndef I2C_LIB_H_
 #define I2C_LIB_H_
+
+#define SDA
+#define SCL
+#define I2C_CR uint8_t
+#define I2C_ST uint8_t
 
 #define I2C_WRITE 0
 #define I2C_READ 1
