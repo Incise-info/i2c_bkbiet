@@ -14,11 +14,11 @@ void i2c_Init(void)
 {
 	SDA=SCL=1;  //setting the input pins of clock and data
 	
-	TWICON0=0x08; //I2C enabled and start condition is given
+	//I2C_CR=0x08; //I2C enabled and start condition is given
 	
-	TWIADD=0x80; //address is given during inititation
-	
-	TWISTAT=0x00; //status register is initiated as 0
+	I2C_ST=0x00; //status register is initiated as 0
+
+	//I2C_ADD=0x10; // Address of the master is given
 }
 
 /************************************************************************/
@@ -26,8 +26,7 @@ void i2c_Init(void)
 /************************************************************************/
 void i2c_Wait(void);
 {
-	while ((TWICON0 & 0x00) || (TWISTAT & 0x04)); //Transmit is in progress
-
+	while ((I2C_CR & 0x81) || (I2C_ST & )); //Transmit is in progress
 }
 
 /************************************************************************/
@@ -36,7 +35,7 @@ void i2c_Wait(void);
 void i2c_Start(void)
 {
 	i2c_Wait();
-	TWISTA=1;
+	I2C_CR=0x20;  //It will start the i2c
 }
 
 /************************************************************************/
@@ -45,7 +44,7 @@ void i2c_Start(void)
 void i2c_Restart(void)
 {
 	i2c_Wait();
-	
+	I2C_CR=0x20; //Repeated start
 }
 
 /************************************************************************/
@@ -54,7 +53,7 @@ void i2c_Restart(void)
 void i2c_Stop(void)
 {
 	i2c_Wait();
-	TWISTO=1;
+	I2C_CR=0x10; //it will stop 
 }
 
 /************************************************************************/
@@ -63,21 +62,22 @@ void i2c_Stop(void)
 void i2c_Write(unsigned char data)
 {
 	i2c_Wait();
-	TWIDR=data;
 }
 
 /************************************************************************/
 /*  i2c_Address - Sends Slave Address and Read/Write mode 
 	mode is either I2C_WRITE or I2C_READ                                                                 */
 /************************************************************************/
-void i2c_Address(unsigned char address, unsigned char mode){
+void i2c_Address(unsigned char address, unsigned char mode)
+{
 	
 }
 
 /************************************************************************/
 /*    i2c_Read - Reads a byte from Slave device                                                                  */
 /************************************************************************/
-unsigned char i2c_Read(unsigned char ack){
+unsigned char i2c_Read(unsigned char ack)
+{
 	
 }
 

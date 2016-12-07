@@ -12,6 +12,8 @@
 #define SCL
 #define I2C_CR uint8_t
 #define I2C_ST uint8_t
+#define I2C_ADD uint8_t
+#define I2C_DR uint8_t
 
 #define I2C_WRITE 0
 #define I2C_READ 1
