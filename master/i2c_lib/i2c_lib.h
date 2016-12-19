@@ -5,30 +5,33 @@
  *  Author: Admin
  */ 
 
+
 #ifndef I2C_LIB_H_
 #define I2C_LIB_H_
 
-#define SDA
-#define SCL
-#define I2C_CR uint8_t
-#define I2C_ST uint8_t
-#define I2C_ADD uint8_t
-#define I2C_DR uint8_t
-#define tm uint8_t
-
-#define I2C_WRITE 0
+#define I2C_WRITE 0 
 #define I2C_READ 1
 
-void i2c_Init(void);
-void i2c_read_ack(void);
-void I2C_write_ack(void);
-void i2c_Wait(void);
+int SCL = 0x01;
+int SDA = 0x01;
+uint8_t I2C_CR =0;
+uint8_t I2C_ST =0;
+uint8_t I2C_ADR =0;
+uint8_t I2C_DR =0;
+uint8_t ackn = 0;
+int mode = 0;
+int count = 0;
+uint8_t flag=0;
+uint8_t I2CADD;
+
 void i2c_Start(void);
-void i2c_Restart(void);
-void i2c_Stop(void);
+void i2c_add();
+void i2c_ADR(unsigned char add , unsigned char mode);
+void i2c_read_ack();
+void clock (int x);
+void i2c_init();
 void i2c_Write(unsigned char data);
-void i2c_Address(unsigned char address, unsigned char mode);
-void I2C_SLAVE_read_add(unsigned int SDA);
-void I2C_SLAVE_read_data(unsigned int SDA);
+void I2C_SLAVE_read();
+void I2C_SLAVE_write();
 
 #endif /* I2C_LIB_H_ */
