@@ -1,9 +1,7 @@
-/*
- * i2c_lib.c
- *
- * Created: 11/14/2016 3:43:26 PM
- *  Author: Admin
- */ 
+
+
+
+
 
 #include <util/delay.h>
 #include <stdio.h>
@@ -15,9 +13,9 @@
 /************************************************************************/
 void i2c_Start(void)
 {
-	SDA = 0;			//make sda line to low
-	PORTD = SDA;		// send logic to port
-	_delay_ms(1000);		//provide delay	
+	SDA = 0;				//make sda line to low
+	PORTC = SDA<<0 | SCL<<1;	// send logic to port
+	_delay_ms(2000);		//provide delay
 	I2C_CR = 0b00000001;  //It will start the i2c
 	I2C_ST = 0b00000010;	// set status register for start condition
 }
@@ -34,19 +32,30 @@ void i2c_add()
 		for (unsigned char c=1; c<=8; c++)
 		{
 			clock(0);							// change state of clock to low
-			PORTD=(I2C_ADR >> 7);				//sending 1 bit of data 
+			SDA = (I2C_ADR >> 7);
+			PORTC= SDA<<0| SCL<<1;				//sending 1 bit of data
 			I2C_ADR = I2C_ADR << 1;				//shifting the address register
-			_delay_ms(200);						// provide delay
+			_delay_ms(800);					// provide delay
 			clock(1);							// change state of clock to high
 		}
+		_delay_ms(100);
+		PORTC = 1<<0 | 0<<1;
 		i2c_read_ack();
+		clock(1);
+		
 		if (ackn == 1)
 		{
+			PORTB = 0xFF;
+			_delay_ms(1000);
 			I2C_CR = 0b00001100;
 			I2C_ST = 0b00000011;
 		}
-		
-				
+		else
+		{
+			I2C_CR =0;
+			I2C_ST =0;
+			
+		}
 	}
 }
 
@@ -56,15 +65,22 @@ void i2c_add()
 
 void i2c_ADR(unsigned char add , unsigned char mode)
 {
-	I2C_ADR = add;
-	I2C_ADR = (I2C_ADR << 1 ) + mode;
-	
+	I2C_ADR = add + mode;
 }
 void i2c_read_ack()
 {
-	_delay_ms(100);
-	ackn = 1;
+	DDRC = 0x00;
+	for (int s=20;s>=0;s--)
+	{
+		if ((PINC & 0x01) == 0)
+		{
+			ackn = 1;
+		}
+		_delay_ms(80);
 		
+	}
+	DDRC = 0x03;
+	
 }
 
 /************************************************************************/
@@ -74,26 +90,33 @@ void i2c_read_ack()
 void clock (int x)
 {
 	SCL = x;
-	PORTC = SCL;
-	_delay_ms(200);
+	PORTC = SCL<<1 | SDA<<0;
+	_delay_ms(1000);
 }
 
 void i2c_Write(unsigned char data)
 {
+	
 	if ((I2C_ST & 0x0c) && (I2C_CR & 0x03))
 	{
 		I2C_DR = data;
 		for (unsigned char c=1; c<=8; c++)
 		{
 			clock(0);							// change state of clock to low
-			PORTD=(I2C_DR >> 7);		//sending 1 bit of data
+			PORTC=(I2C_DR >> 7) | SCL<<1;		//sending 1 bit of data
 			I2C_DR = I2C_DR << 1;				//shifting the address register
-			_delay_ms(200);						// provide delay
+			_delay_ms(800);						// provide delay
 			clock(1);							// change state of clock to high
 		}
+		i2c_read_ack();
+		if (ackn == 1)
+		{
+			PORTB = 0xff;
+			_delay_ms(1000);
+			PORTB = 0x00;
+			_delay_ms(1000);
+		}
 	}
-	
-	i2c_read_ack();
 }
 
 /************************************************************************/
@@ -102,9 +125,8 @@ void i2c_Write(unsigned char data)
 
 void i2c_init()
 {
-	PORTD = SDA;
-	PORTC = SCL;
-	_delay_ms(2000);
+	PORTC = SDA<<0 | SCL<<1;
+	_delay_ms(3000);
 }
 
 /************************************************************************/
@@ -115,111 +137,91 @@ void stop()
 	if (SCL == 0)
 	{
 		clock(1);
-		PORTD = 0x01;
-		_delay_ms(100);
+		PORTC = 1<<0 | SCL<<1;
+		_delay_ms(1000);
 	}
 	else
 	{
-		PORTD = 0x01;
-		_delay_ms(100);
+		PORTC = 1<<0 | SCL<<1;
+		_delay_ms(1000);
 		
 	}
 }
 
 
-void address(unsigned int add)		//address function definition
+void slave_init()
 {
-	if(I2CADD==add){				//comparison of address
-		flag=1;						//set flag
+	if ((PINC & 0x03) == 0x03)
+	{
+		start = 1;
+		PORTB = 0x01;
 	}
-	if(flag==1){					//checking flag to generate ack
-		I2C_SLAVE_write_ack(flag);
-	}
-	
-}
-void I2C_SLAVE_read()
-{
-	uint8_t temp;   //assigning initial value to address
-	int c;
-	if(flag==0){
-		for(uint8_t i=128;i>=1;i=i/2)
-		{
-			if((PINB & 0x01)==1)
-			{
-				temp=i;
-				
-			}
-			else
-			{
-				temp=0;
-			}
-			if(i==1)
-			{
-				c=(PINB & 0x01);
-				if(c==1){
-					I2C_CR = 0x0c;
-					I2C_ST = 0x03;
-				}
-				
-				else{
-					I2C_CR = 0x28;
-					I2C_ST = 0x44;
-				}
-			}
-			else
-			{				//calculation of address
-				I2C_DR = I2C_DR + temp;	//rest of bits are assumed as address bits
-			}
-		}
-		int sda_p = temp;
-		if(I2CADD == I2C_DR){				//comparison of address
-			flag=1;						//set flag
-		}
-	}
-	else{									// data reading
-		for(int i=128;i>=1;i=i/2)
-		{
-			if((PINB & 0x01)==1)
-			{
-				temp=i;
-				
-			}
-			else
-			{
-				temp=0;
-			}
-			if(i==1)
-			{
-				c=(PINB & 0x01);
-				if(c==1){
-					I2C_CR =	0x0c;
-					I2C_ST = 0x03;
-				}
-				
-				else{
-					I2C_CR = 0x28;
-					I2C_ST = 0x44;
-				}
-			}
-			else
-			{				//calculation of address
-				I2C_DR = I2C_DR + temp;	//rest of bits are assumed as address bits
-			}
-		}
-		if(I2C_DR == 75){
-			PORTD = 0xff;
-			_delay_ms(1000);
-			I2C_DR = 0x00;
-		}
-	}
-	
 }
 
-void I2C_SLAVE_write()
+void slave_start()
 {
-	uint8_t my;
-	PORTB=0x00;
-	my=I2C_DR;
-	PORTB=(my<<1&0x03);
-	my=my>>1;
+	if ((start == 1) && ((PINC & 0x02) == 0x02))
+	{
+		read = 1;
+		ready = 1;
+		PORTB = 0x02;
+	}
+}
+void send_ack()
+{
+	DDRC = 0x02;
+	PORTC = 0x00;
+	_delay_ms(1500);
+	DDRC = 0x00;
+}
+
+void read_add_slave()
+{
+	int x = 1, ready = 0, check = 0;;
+	if (read == 1)
+	{
+		PORTB = 0x03;
+		while (x<=8)
+		{
+			if((PINC & 0x02) == 0x02 && ready == 0)
+			{
+				PORTB = 0x04;
+				ready = 1;
+			}
+			if((PINC & 0x02)==0 && ready == 1)
+			{
+				check = 1;
+				PORTB = 0x08;
+				ready = 0;
+			}
+			
+			if (check == 1)
+			{
+				I2C_DR += (PINC & 0x01);
+				I2C_DR = I2C_DR <<1;
+				check = 0;
+				x++;
+				PORTD = (PINC & 0x01);
+			}
+			
+		}
+		PORTD = I2C_DR;
+		send_ack();
+		if (I2C_ADR == I2C_DR)
+		{
+			PORTB = 0x80;
+		}
+		mode_slave = (I2C_DR & 0x01);
+		if (mode_slave == 0)
+		{
+			read_slave = 1;
+		}
+		else
+		{
+			write_slave = 1;
+			read = 0;
+		}
+		
+		
+	}
 }

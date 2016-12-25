@@ -12,6 +12,12 @@
 #define I2C_WRITE 0 
 #define I2C_READ 1
 
+uint8_t ready = 0;
+uint8_t read = 0;
+uint8_t start = 0;
+uint8_t write_slave;
+uint8_t read_slave;
+uint8_t mode_slave;
 int SCL = 0x01;
 int SDA = 0x01;
 uint8_t I2C_CR =0;
@@ -24,6 +30,10 @@ int count = 0;
 uint8_t flag=0;
 uint8_t I2CADD;
 
+void read_add_slave();
+void send_ack();
+void slave_init();
+void slave_start();
 void i2c_Start(void);
 void i2c_add();
 void i2c_ADR(unsigned char add , unsigned char mode);
