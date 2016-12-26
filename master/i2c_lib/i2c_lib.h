@@ -37,7 +37,7 @@ void slave_start();
 void i2c_Start(void);
 void i2c_add();
 void i2c_ADR(unsigned char add , unsigned char mode);
-void i2c_read_ack();
+int i2c_read_ack();
 void clock (int x);
 void i2c_init();
 void i2c_Write(unsigned char data);
