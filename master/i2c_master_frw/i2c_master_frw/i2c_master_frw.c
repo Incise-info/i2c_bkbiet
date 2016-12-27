@@ -9,7 +9,7 @@ int main(void)
 	DDRD = 0xff;
 	DDRB = 0xff;
 	i2c_init();
-	i2c_ADR(0b01100110, 0);
+	i2c_ADR(0xf2, 0);
 	i2c_Start();
 	while(1)
 	{

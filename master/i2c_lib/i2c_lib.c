@@ -35,14 +35,13 @@ void i2c_add()
 			_delay_ms(1000);						// provide delay
 			clock(1);							// change state of clock to high
 		}
-		_delay_ms(100);
 		PORTC = 0<<0 | 0<<1;
 		i2c_read_ack();
 		clock(1);
 		
 		if (ackn == 1)
 		{
-			PORTB = 0xFF;
+			PORTB = 0x0f;
 			_delay_ms(1000);
 			I2C_CR = 0b00001100;
 			I2C_ST = 0b00000011;
@@ -71,17 +70,16 @@ int i2c_read_ack()
 	DDRC = 0x00;
 	for (int s=20;s>=0;s--)
 	{
-		if ((PINC & 0x01) == 0)
+		if ((PINC & 0x01) == 1)
 		{
 			ackn = 1;
 			DDRC = 0x03;
 			return 0;
 		}
 		_delay_ms(100);
-		
 	}
 	DDRC = 0x03;
-	
+	return 0;
 }
 
 /************************************************************************/
@@ -92,7 +90,7 @@ void clock (int x)
 {
 	SCL = x;
 	PORTC = SCL<<1 | SDA<<0;
-	_delay_ms(2000);
+	_delay_ms(1000);
 }
 
 void i2c_Write(unsigned char data)
@@ -173,7 +171,8 @@ void slave_start()
 }
 void send_ack()
 {
-	DDRC = 0x02;
+	DDRC = 0x0f;
+	PORTB = 0xf0;
 	PORTC = 0x01;
 	_delay_ms(1500);
 	DDRC = 0x00;
@@ -182,9 +181,10 @@ void send_ack()
 
 void read_add_slave()
 {
-	int x = 1, check = 0;;
+	
 	if (read == 1)
 	{
+		int x = 1, check = 0;
 		PORTB = 0x03;
 		_delay_ms(100);
 		while (x<=8)
@@ -205,22 +205,28 @@ void read_add_slave()
 			
 			if (check == 1)
 			{
+				_delay_ms(1000);
 				I2C_DR += (PINC & 0x01);
-				I2C_DR = I2C_DR <<1;
+				if (x<8)
+				{
+					I2C_DR = I2C_DR <<1;
+				}
 				PORTD = (PINC & 0x01);
 				check = 0;
 				x++;
-				
 			}
-			
+			PORTB = x;
 		}
+		read = 0;
 		PORTD = I2C_DR;
+		_delay_ms(2000);
 		send_ack();
 		if (I2C_ADR == I2C_DR)
 		{
-			PORTB = 0x01;
-			_delay_ms(100);
+			PORTB = 0xc0;
+			_delay_ms(500);
 		}
+		read = 0;
 		mode_slave = (I2C_DR & 0x01);
 		if (mode_slave == 0)
 		{
@@ -231,7 +237,5 @@ void read_add_slave()
 			write_slave = 1;
 			read = 0;
 		}
-		
-		
 	}
 }
