@@ -1,3 +1,4 @@
+#define F_CPU 16000000UL
 #include <util/delay.h>
 #include <stdio.h>
 #include <avr/io.h>
@@ -41,7 +42,7 @@ void i2c_add()
 		
 		if (ackn == 1)
 		{
-			PORTB = 0x0f;
+			PORTD = 0x80;
 			_delay_ms(1000);
 			I2C_CR = 0b00001100;
 			I2C_ST = 0b00000011;
@@ -67,19 +68,30 @@ void i2c_ADR(unsigned char add , unsigned char mode)
 }
 int i2c_read_ack()
 {
-	DDRC = 0x00;
+	DDRC = 0xfe;
 	for (int s=20;s>=0;s--)
 	{
 		if ((PINC & 0x01) == 1)
 		{
 			ackn = 1;
 			DDRC = 0x03;
+			_delay_ms(2000);
 			return 0;
 		}
-		_delay_ms(100);
+		_delay_ms(10);
 	}
 	DDRC = 0x03;
 	return 0;
+}
+
+void send_ack()
+{
+	DDRC = 0x01;
+	PORTB = 0xf0;
+	PORTC |= 1<<0;
+	_delay_ms(1500);
+	DDRC = 0x00;
+	PORTC = 0;
 }
 
 /************************************************************************/
@@ -169,19 +181,9 @@ void slave_start()
 		_delay_ms(100);
 	}
 }
-void send_ack()
-{
-	DDRC = 0x0f;
-	PORTB = 0xf0;
-	PORTC = 0x01;
-	_delay_ms(1500);
-	DDRC = 0x00;
-	PORTC = 0;
-}
 
 void read_add_slave()
 {
-	
 	if (read == 1)
 	{
 		int x = 1, check = 0;
@@ -218,7 +220,8 @@ void read_add_slave()
 			PORTB = x;
 		}
 		read = 0;
-		PORTD = I2C_DR;
+		start = 0;
+		PORTB = I2C_DR;
 		_delay_ms(2000);
 		send_ack();
 		if (I2C_ADR == I2C_DR)

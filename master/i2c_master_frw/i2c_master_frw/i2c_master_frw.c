@@ -1,5 +1,6 @@
 
-#include <avr/io.h>0
+#define F_CPU 16000000UL
+#include <avr/io.h>
 #include <util/delay.h>
 //#include "i2c_lib.h"
 
