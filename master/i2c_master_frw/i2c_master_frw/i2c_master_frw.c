@@ -1,5 +1,5 @@
 
-#define F_CPU 16000000UL
+//#define F_CPU 8000000UL
 #include <avr/io.h>
 #include <util/delay.h>
 //#include "i2c_lib.h"
@@ -15,6 +15,7 @@ int main(void)
 	while(1)
 	{
 		i2c_add();
-		//i2c_Write('a');
+		i2c_Write(0xaa);
+		stop();
 	}
 }
